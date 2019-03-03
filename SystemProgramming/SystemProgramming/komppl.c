@@ -67,7 +67,7 @@ union                                             /*шаблон дл€ ген�
     char PROB1;
     char OPERAC  [5];
     char PROB2;
-    char OPERAND [12];
+    char OPERAND [50]; //12
     char PROB3;
     char COMM    [52];
    } _BUFCARD;
@@ -1109,14 +1109,14 @@ ODC11:                                            /* если идентифик
 						  /* фикатор нулем          */
 
 ODC12:
-     if ( !strcmp ( FORMT [5], "INIT" )  )
-         strcpy ( SYM [ISYM++].INIT, FORMT [6] );
+     if ( !strcmp ( FORMT [4], "INIT" )  )
+         strcpy ( SYM [ISYM++].INIT, FORMT [5] );
      else
          strcpy ( SYM [ISYM++].INIT, "" );
      
 ODC13:
-     if ( !strcmp ( FORMT [5], "INIT" )  )
-         strcpy ( SYM [ISYM++].INIT, FORMT [6] );
+     if ( !strcmp ( FORMT [4], "INIT" )  )
+         strcpy ( SYM [ISYM++].INIT, FORMT [5] );
      else
          strcpy ( SYM [ISYM++].INIT, "0" );
      
@@ -1380,7 +1380,7 @@ int AVI2 ()
                            strlen( FORMT [IFORMT-1] ) ] == '|' )
               {
                       memcpy ( ASS_CARD._BUFCARD.OPERAC,
-                              "OR", 1 );
+                              "OR", 2 );
               }
                   
                   else
@@ -1573,7 +1573,7 @@ int OEN2 ()
     if ( isalpha ( SYM [i].NAME [0] ) )           /* содержит идентификатор,*/
 						  /* т.е.начинаетс€ с буквы,*/
      {                                            /* то:                    */
-      if ( SYM [i].TYPE == 'B' || SYM [i].TYPE == 'C' || SYM [i].TYPE == 'I')                  /* если тип оператора bin */
+      if ( SYM [i].TYPE == 'B')                  /* если тип оператора bin */
 						  /* fixed, то:             */
        {
 	strcpy ( ASS_CARD._BUFCARD.METKA,         /* пишем идентификатор в  */
@@ -1607,6 +1607,38 @@ int OEN2 ()
 
 	ZKARD ();                                 /* запомнить операцию     */
 						  /*    јссемблера          */
+       } else if (SYM [i].TYPE == 'C') {
+           strcpy ( ASS_CARD._BUFCARD.METKA,
+                   SYM [i].NAME );
+          
+           
+           memcpy ( ASS_CARD._BUFCARD.OPERAC,
+                   "DC", 2 );
+        
+               
+           strcpy ( ASS_CARD._BUFCARD.OPERAND, "CE" );
+           strcat(ASS_CARD._BUFCARD.OPERAND, SYM[i].INIT);
+           
+           memcpy ( ASS_CARD._BUFCARD.COMM,
+                   "ќпределение переменной", 22 );
+           ZKARD ();
+       } else if (SYM [i].TYPE == 'I') {
+           strcpy ( ASS_CARD._BUFCARD.METKA,
+                   SYM [i].NAME );
+          
+           
+           memcpy ( ASS_CARD._BUFCARD.OPERAC,
+                   "DC", 2 );
+           
+           
+           strcpy ( ASS_CARD._BUFCARD.OPERAND, "P\'" );
+           strcat(ASS_CARD._BUFCARD.OPERAND, SYM[i].INIT);
+           ASS_CARD._BUFCARD.OPERAND [ strlen        /* замыкающий апостроф    */
+                                      ( ASS_CARD._BUFCARD.OPERAND ) ] = '\'';  /*          и             */
+           
+           memcpy ( ASS_CARD._BUFCARD.COMM,
+                   "ќпределение переменной", 22 );
+           ZKARD ();
        }
      }
    }
@@ -1676,7 +1708,7 @@ int OPA2 ()
 	   {                                      /* имеет тип bin fixed,то:*/
 
 	    if ( strcmp ( SYM [i].RAZR, "15" )    /* если bin fixed (15),то:*/
-					    <= 0 )
+					    <= 0 && (SYM [i].TYPE != 'C' && SYM [i].TYPE != 'I'))
 	     memcpy ( ASS_CARD._BUFCARD.OPERAC,   /* сформировать команду   */
 				       "STH", 3 );/* записи полуслова       */
 
